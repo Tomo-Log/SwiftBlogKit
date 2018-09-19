@@ -1,10 +1,10 @@
-import FluentSQLite
+import FluentMySQL
 import Vapor
 
 /// Called before your application initializes.
 public func configure(_ config: inout Config, _ env: inout Environment, _ services: inout Services) throws {
     /// Register providers first
-    try services.register(FluentSQLiteProvider())
+//    try services.register(FluentMySQLProvider())
 
     /// Register routes to the router
     let router = EngineRouter.default()
@@ -13,36 +13,34 @@ public func configure(_ config: inout Config, _ env: inout Environment, _ servic
 
     /// Register middleware
     var middlewares = MiddlewareConfig() // Create _empty_ middleware config
-    /// middlewares.use(FileMiddleware.self) // Serves files from `Public/` directory
+    middlewares.use(FileMiddleware.self) // Serves files from `Public/` directory
     middlewares.use(ErrorMiddleware.self) // Catches errors and converts to HTTP response
     services.register(middlewares)
 
-    // Configure a SQLite database
-    let sqlite = try SQLiteDatabase(storage: .memory)
-
-    /// Register the configured SQLite database to the database config.
-    var databases = DatabasesConfig()
-    databases.add(database: sqlite, as: .sqlite)
-    services.register(databases)
-
-    /// Configure migrations
-    var migrations = MigrationConfig()
-//    migrations.add(model: Todo.self, database: .sqlite)
-    services.register(migrations)
-
-    Adatabase()
+    //Database
+    try setupDatabase(&config, &env, &services)
 }
 
-func Adatabase() {
-    if let hostname = Environment.get("MYSQL_HOSTNAME") {
-        print(hostname)
+func setupDatabase(_ config: inout Config, _ env: inout Environment, _ services: inout Services) throws {
+    
+    guard
+        let hostname = Environment.get("MYSQL_HOSTNAME"),
+        let username = Environment.get("MYSQL_USERNAME"),
+        let password = Environment.get("MYSQL_ROOT_PASSWORD"),
+        let database = Environment.get("MYSQL_DATABASE")
+        else {
+            throw Abort(.internalServerError)
     }
     
-    if let password = Environment.get("MYSQL_ROOT_PASSWORD") {
-        print(password)
-    }
+    //DB
+    try services.register(FluentMySQLProvider())
     
-    if let database = Environment.get("MYSQL_DATABASE") {
-        print(database)
-    }
+    //MyWSQL
+    let databaseConfig : MySQLDatabaseConfig = MySQLDatabaseConfig(hostname: hostname,
+                                                                port: 3306,
+                                                                username: username,
+                                                                password: password,
+                                                                database: database)
+
+    services.register(databaseConfig)
 }

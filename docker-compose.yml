@@ -8,6 +8,7 @@ services:
       - ./:/home/vapor/SwiftBlogKit/
       - ./docker/nginx:/etc/nginx/sites-enabled/
     environment:
+      - MYSQL_USERNAME=root
       - MYSQL_ROOT_PASSWORD=password
       - MYSQL_DATABASE=sbkit
       - MYSQL_HOSTNAME=mysql
