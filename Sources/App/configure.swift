@@ -27,7 +27,22 @@ public func configure(_ config: inout Config, _ env: inout Environment, _ servic
 
     /// Configure migrations
     var migrations = MigrationConfig()
-    migrations.add(model: Todo.self, database: .sqlite)
+//    migrations.add(model: Todo.self, database: .sqlite)
     services.register(migrations)
 
+    Adatabase()
+}
+
+func Adatabase() {
+    if let hostname = Environment.get("MYSQL_HOSTNAME") {
+        print(hostname)
+    }
+    
+    if let password = Environment.get("MYSQL_ROOT_PASSWORD") {
+        print(password)
+    }
+    
+    if let database = Environment.get("MYSQL_DATABASE") {
+        print(database)
+    }
 }

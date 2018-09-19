@@ -1,0 +1,27 @@
+version: '3'
+services:
+ vapor3:
+    build: ./
+    ports:
+      - 80:80 
+    volumes:
+      - ./:/home/vapor/SwiftBlogKit/
+      - ./docker/nginx:/etc/nginx/sites-enabled/
+    environment:
+      - MYSQL_ROOT_PASSWORD=password
+      - MYSQL_DATABASE=sbkit
+      - MYSQL_HOSTNAME=mysql
+    links:
+       - mysql57
+
+ mysql57:
+    restart: always       
+    image: mysql:5.7.23    
+    command: mysqld --character-set-server=utf8mb4
+    volumes:
+      - ./docker/mysql:/var/lib/mysql
+    environment:                          
+      - MYSQL_ROOT_PASSWORD=password
+      - MYSQL_DATABASE=sbkit
+    ports:
+      - 3306:3306
