@@ -1,24 +1,42 @@
 import FluentMySQL
 import Vapor
+import Leaf
+import Authentication
 
 /// Called before your application initializes.
 public func configure(_ config: inout Config, _ env: inout Environment, _ services: inout Services) throws {
-    /// Register providers first
-//    try services.register(FluentMySQLProvider())
+
+    //Auth
+    try services.register(AuthenticationProvider())
+    config.prefer(MemoryKeyedCache.self, for: KeyedCache.self)
+
+    //Leaf
+    try setLeaf(&config, &env, &services)
 
     /// Register routes to the router
     let router = EngineRouter.default()
     try routes(router)
     services.register(router, as: Router.self)
-
+    
     /// Register middleware
+    try setMiddlewares(&config, &env, &services)
+    
+    //Database & Mgirations
+    try setupDatabase(&config, &env, &services)
+    try setMigrations(&config, &env, &services)
+}
+
+public func setLeaf(_ config: inout Config, _ env: inout Environment, _ services: inout Services) throws {
+    try services.register(LeafProvider())
+    config.prefer(LeafRenderer.self, for: ViewRenderer.self)
+}
+
+public func setMiddlewares(_ config: inout Config, _ env: inout Environment, _ services: inout Services) throws {
     var middlewares = MiddlewareConfig() // Create _empty_ middleware config
     middlewares.use(FileMiddleware.self) // Serves files from `Public/` directory
     middlewares.use(ErrorMiddleware.self) // Catches errors and converts to HTTP response
+    middlewares.use(SessionsMiddleware.self)
     services.register(middlewares)
-
-    //Database
-    try setupDatabase(&config, &env, &services)
 }
 
 func setupDatabase(_ config: inout Config, _ env: inout Environment, _ services: inout Services) throws {
@@ -43,4 +61,10 @@ func setupDatabase(_ config: inout Config, _ env: inout Environment, _ services:
                                                                 database: database)
 
     services.register(databaseConfig)
+}
+
+public func setMigrations(_ config: inout Config, _ env: inout Environment, _ services: inout Services) throws {
+    var migrations = MigrationConfig()
+    migrations.add(model: Article.self, database: .mysql)
+    services.register(migrations)
 }
