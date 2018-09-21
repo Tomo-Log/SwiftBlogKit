@@ -7,6 +7,8 @@ public func routes(_ router: Router) throws {
         return "Hello, world!"
     }
 
+//    User.authSessionsMiddleware()
+    
     // Example of configuring a controller
 //    let todoController = TodoController()
 //    router.get("todos", use: todoController.index)
