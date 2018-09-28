@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+    
+    <head>
+        <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+            <meta charset="utf-8" />
+            <title>#(meta.title)</title>
+            
+            <meta name="description" content="#(meta.description)" />
+            <meta name="keywords"    content="#(meta.keywords)" />
+            
+            <link rel="stylesheet" href="#(meta.css)" />
+            </head>
+    
+    <body>
+        
+        <header class="header">
+            <h1><a href="#(title.url)" class="not_decoration">#(title.label)</a></h1>
+            <hr class="double">
+        </header>
+
+        <div>#get(menu)</div>
+
+        <div>
+            #get(content)
+        </div>
+        
+        <footer class="footer">
+            &copy; #(blogtitle)
+        </footer>
+    </body>
+    
+</html>

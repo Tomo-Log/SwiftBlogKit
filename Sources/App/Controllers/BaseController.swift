@@ -9,7 +9,7 @@ import Vapor
 
 class BaseController {
     internal var path : String = ""
-    func addRoute(to router:Router, path:String) {
+    func addPath(_ path:String, to router:Router) {
         self.path = path
     }
 }

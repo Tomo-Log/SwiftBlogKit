@@ -10,7 +10,14 @@ import Crypto
 
 final class LoginViewController : BaseViewController {
 
-    override var templatePath: String { return "Admin/login"}
+    override var templatePath: String { return "AdminTool/login"}
+    
+    override func addPath(_ path: String, to router: Router) {
+        super.addPath(path, to: router)
+        
+        router.get(path, use: self.index)
+        router.post(path, use: self.login)
+    }
     
     private struct Credential : Codable {
         var email:String
@@ -27,23 +34,17 @@ final class LoginViewController : BaseViewController {
         
         return credential.flatMap(to:Response.self){
             credential in
-            
-            //let hash = try BCrypt.hash(credential.password)
-            
             let authed = User.authenticate(username: credential.email, password: credential.password, using: BCryptDigest(), on: req)
             
             return authed.flatMap(to:Response.self) {
                 writer in
                 
                 if let user = writer {
-                    try req.authenticateSession(user)//.authenticate(user)
-                    
+                    try req.authenticateSession(user)
                     return try req.redirect(to: URI.AdminTool.articles.path).encode(for: req)
-                    //                    return try  ErrorViewController.showError(req, message: "ログインした")
                 }
                 else {
                     return try req.redirect(to: URI.AdminTool.login.path).encode(for: req)
-                    //                    return try  ErrorViewController.showError(req, message: "ログインできなかった")
                 }
             }
         }
