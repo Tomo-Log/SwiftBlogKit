@@ -38,3 +38,7 @@ extension User: PasswordAuthenticatable {
         return \User.passwordHash
     }
 }
+
+extension User {
+    
+}

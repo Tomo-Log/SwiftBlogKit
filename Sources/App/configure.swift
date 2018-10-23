@@ -24,6 +24,12 @@ public func configure(_ config: inout Config, _ env: inout Environment, _ servic
     //Database & Mgirations
     try setupDatabase(&config, &env, &services)
     try setMigrations(&config, &env, &services)
+    
+    //Commands
+    var commandConfig : CommandConfig = CommandConfig.default()
+    AddAdminUserCommand.addCommand(to: &commandConfig)
+//    commandConfig.use(AddAdminUserCommand(), as: "cowsay")
+    services.register(commandConfig)
 }
 
 public func setLeaf(_ config: inout Config, _ env: inout Environment, _ services: inout Services) throws {
@@ -66,5 +72,6 @@ func setupDatabase(_ config: inout Config, _ env: inout Environment, _ services:
 public func setMigrations(_ config: inout Config, _ env: inout Environment, _ services: inout Services) throws {
     var migrations = MigrationConfig()
     migrations.add(model: Article.self, database: .mysql)
+    migrations.add(model: User.self, database: .mysql)
     services.register(migrations)
 }
